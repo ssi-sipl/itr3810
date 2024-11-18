@@ -1,0 +1,41 @@
+***************************************************************************************
+
+      II    N     N     N     N      OOOO      SSSSS     EEEEE    N     N    TTTTTTT 
+     II    NNN   N     NNN   N    OO    OO    S         E        NNN   N       T
+    II    N NN  N     N NN  N    OO    OO    SSSSS     EEE      N NN  N       T
+   II    N  NN N     N  NN N    OO    OO        S     E        N  NN N       T
+  II    N    NN     N    NN      OOOO      SSSSS     EEEEE    N    NN       T
+                         copyright (c) 2023, InnoSenT GmbH
+                                 all rights reserved
+
+
+***************************************************************************************
+
+    RELEASE NOTES - RadarAPI:
+
+
+***************************************************************************************
+
+    V 1.147                                                                  2023-10-18
+
+	- added loop zones
+	- changed command enums for 5220 compatibility
+
+***************************************************************************************
+
+    V 1.146                                                                  2023-09-13
+
+	- bugfix memory leak -> increases file descriptors every initSystem and exitSystem -> crash after 1024 file descriptors
+	- bugfix network traffic -> targetList and reducedTargetList output enabled by default -> >100 MBit network traffic
+	- removed two unused functions
+	- removed hardware version info
+
+***************************************************************************************
+    V 1.145                                                                  2023-01-17
+
+    - internal improvements
+	- increased accuracy of GPS coordinates
+	- increased reconnect timeout from 10ms to 100ms
+	- implemented iperf3 server
+
+***************************************************************************************

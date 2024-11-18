@@ -1,0 +1,62 @@
+***************************************************************************************
+
+      II    N     N     N     N      OOOO      SSSSS     EEEEE    N     N    TTTTTTT 
+     II    NNN   N     NNN   N    OO    OO    S         E        NNN   N       T
+    II    N NN  N     N NN  N    OO    OO    SSSSS     EEE      N NN  N       T
+   II    N  NN N     N  NN N    OO    OO        S     E        N  NN N       T
+  II    N    NN     N    NN      OOOO      SSSSS     EEEEE    N    NN       T
+                         copyright (c) 2023, InnoSenT GmbH
+                                 all rights reserved
+
+
+***************************************************************************************
+
+    RELEASE NOTES - Firmware:
+
+
+***************************************************************************************
+
+  
+    ITR-3810_V1.004.upd                                                     2024-01-24
+
+    
+    change log:
+
+	- bugfix upload playback file
+
+
+***************************************************************************************
+
+  
+    ITR-3810_V1.003.upd                                                     2023-11-07
+
+    
+    change log:
+
+	- added iSYS5220 API compatibility (API 1.117)
+
+
+***************************************************************************************
+
+  
+    ITR-3810_V1.002.upd                                                     2023-10-18
+
+    
+    change log:
+
+	- added new feature: fixed ip settings over RS485
+	- added new zone: loop zone
+	- new traffic tracker V.3.035
+	- bugfix: save und load eventzone conditions
+
+
+***************************************************************************************
+  
+    ITR-3810_V1.001.upd                                                     2023-09-13
+
+    
+    change log:
+
+	- initial release
+
+***************************************************************************************
