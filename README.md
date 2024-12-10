@@ -1,9 +1,15 @@
 # itr3810
 
-read_data.py: reads the recieved data from the ITR-3810 from its IP Address: 192.168.31.200/61250.
+### Radar Config
 
+IP Address: 192.168.31.200
 
-ui_1.py: Runs the string of data and classifies them in command line interface.
+Port: 61250.
 
+### Important Files
 
-ui_2.py: Runs the string of data and classifies them in a GUI interface.
+DataParserCLI.py: Listens for the data from the radar and displays it in a CLI interface.
+
+DataParserGUI.py: Listens for the data from the radar and then displays it in a GUI interface.
+
+DataStringParser.py: Custom String Parser for the radar's data.
