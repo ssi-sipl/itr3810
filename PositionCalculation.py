@@ -1,6 +1,6 @@
 import datetime
 
-def parse_itr3810_data(data, radar_id="ITR3810", area_id="Zone 1", lat_radar=22.345678, lon_radar=73.123456):
+def parse_itr3810_data(data, radar_id="ITR3810", area_id="Zone A", lat_radar=22.345678, lon_radar=73.123456):
     """
     Parses data from the ITR3810 radar (300m) and converts it into the desired format.
     Includes exception handling to catch missing or invalid data.
@@ -35,6 +35,7 @@ def parse_itr3810_data(data, radar_id="ITR3810", area_id="Zone 1", lat_radar=22.
         result = {
             "radar_id": radar_id,
             "area_id": area_id,
+            "zone": zone,  # Zone included separately in the output
             "timestamp": timestamp,
             "object_detected": object_detected,
             "classification": obj_class,
