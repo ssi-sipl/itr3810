@@ -1,7 +1,17 @@
 import socket
 import datetime
+import pytz
+from datetime import datetime
 
-def parse_itr3810_data(data, radar_id="ITR3810", area_id="Zone A", lat_radar=22.345678, lon_radar=73.123456):
+ist_timezone = pytz.timezone('Asia/Kolkata')
+
+
+LAT_RADAR = 22.345678
+LONG_RADAR = 73.123456
+RADAR_ID = "Radar-2"
+AREA_ID = "Area-2"
+
+def parse_itr3810_data(data):
     """
     Parses data from the ITR3810 radar (300m) and converts it into the desired format.
     Includes exception handling to catch missing or invalid data.
@@ -11,7 +21,7 @@ def parse_itr3810_data(data, radar_id="ITR3810", area_id="Zone A", lat_radar=22.
         speed = data.get("speed")
         obj_class = data.get("class")
         direction = data.get("direction")
-        timestamp = data.get("timestamp", datetime.datetime.utcnow().isoformat() + "Z")
+        timestamp = data.get("timestamp", datetime.now(ist_timezone))
         
         if zone is None or speed is None or obj_class is None or direction is None:
             raise ValueError("Missing required fields: 'zone', 'speed', 'class', or 'direction'.")
@@ -30,22 +40,42 @@ def parse_itr3810_data(data, radar_id="ITR3810", area_id="Zone A", lat_radar=22.
         }
         range_m = zone_to_range_map.get(zone, 150)  # Default to 150m if zone is unknown
         
-        # Determine if object is detected
-        object_detected = speed > 0
-        
-        result = {
-            "radar_id": radar_id,
-            "area_id": area_id,
-            "zone": zone,  # Zone included separately in the output
-            "timestamp": timestamp,
-            "object_detected": object_detected,
-            "classification": obj_class,
-            "latitude": lat_radar,
-            "longitude": lon_radar,
-            "estimated_range_m": range_m,
-            "direction": direction
+       
+        if (speed > 0) :
+
+            target_info = {
+            'radar_id': "radar-pune",
+            'area_id': "area-1",
+            'frame_id': 0, 
+            'timestamp': str(timestamp),
+            # 'signal_strength': round(signal_strength, 2),
+            'range': round(range_m, 2),
+            'speed': round(speed, 2),
+            # 'aizmuth_angle': round(azimuth, 2),
+            'distance': round(range_m, 2),
+            'direction': direction,
+            'classification': obj_class,
+            'zone': zone,
+            # 'x': round(x, 2),   
+            # 'y': round(y, 2),
+            # 'latitude': round(object_lat, 6),
+            # 'longitude': round(object_lon, 6),
         }
-        return result
+            # object detected
+            result = {
+                "radar_id": RADAR_ID,
+                "area_id": AREA_ID,
+                "zone": zone,  # Zone included separately in the output
+                "timestamp": timestamp,
+                "classification": obj_class,
+                "latitude": LAT_RADAR,
+                "longitude": LONG_RADAR,
+                "estimated_range_m": range_m,
+                "direction": direction
+            }
+            return result
+        
+        return # object not detected
 
     except ValueError as ve:
         print(f"ValueError: {ve}")
@@ -114,6 +144,7 @@ if __name__ == "__main__":
     # Configuration
     SERVER_IP = "192.168.31.200"  # IP address of the server
     SERVER_PORT = 62150           # Port number of the server
+
 
     # Read data continuously from the TCP/IP server
     read_data_continuously(SERVER_IP, SERVER_PORT)
