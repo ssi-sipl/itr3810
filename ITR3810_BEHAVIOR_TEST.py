@@ -32,6 +32,11 @@ try:
     print("Received data from radar:")
     print(json.dumps(response, indent=2))
 
+    with open("radar_response.json", "ax") as f:
+        json.dump(response, f, indent=2)
+
+    
+
 except Exception as e:
     print(f"Error communicating with radar: {e}")
 
