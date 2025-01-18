@@ -1,6 +1,5 @@
 import ctypes
-from functions import get_system_info, get_gps_satellites_in_view
-from structures import ITR3800_GpsSatellitesInView_t, ITR3800_SystemInfo_t
+from functions import get_system_info, get_gps_satellites_in_view, get_gps_coordinates, get_object_list
 
 # Load the radar API DLL
 dll_path = "../Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll"  # Replace with the correct path
@@ -17,11 +16,11 @@ radar_api.ITR3800_initSystem.restype = ITR3800_Result_t
 radar_api.ITR3800_exitSystem.argtypes = [APIHandle_t]
 radar_api.ITR3800_exitSystem.restype = ITR3800_Result_t
 
-radar_api.ITR3800_getSystemInfo.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_SystemInfo_t)]
-radar_api.ITR3800_getSystemInfo.restype = ITR3800_Result_t
+# radar_api.ITR3800_getSystemInfo.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_SystemInfo_t)]
+# radar_api.ITR3800_getSystemInfo.restype = ITR3800_Result_t
 
-radar_api.ITR3800_getGpsSatellitesInView.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_GpsSatellitesInView_t)]
-radar_api.ITR3800_getGpsSatellitesInView.restype = ITR3800_Result_t
+# radar_api.ITR3800_getGpsSatellitesInView.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_GpsSatellitesInView_t)]
+# radar_api.ITR3800_getGpsSatellitesInView.restype = ITR3800_Result_t
 
 # Initialize the radar system
 handle = APIHandle_t()
@@ -33,8 +32,19 @@ print("Radar system initialized successfully.")
 # Get system information
 get_system_info(radar_api, handle)
 
-# Get GPS satellites in view
+# Get GPS satellites in viewfloat32_t()
 get_gps_satellites_in_view(radar_api, handle)
+
+get_gps_coordinates(radar_api,handle)
+
+# Get object list
+objects = get_object_list(radar_api, handle)
+print("Objects Detected:")
+for obj in objects:
+    print(obj)
+
+
+
 
 # Clean up
 result = radar_api.ITR3800_exitSystem(handle)
