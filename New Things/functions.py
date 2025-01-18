@@ -1,27 +1,36 @@
 import ctypes
-from structure import ITR3800_GpsSatellitesInView_t
+from structures import ITR3800_GpsSatellitesInView_t, ITR3800_SystemInfo_t
+
+def get_system_info(api, handle):
+    """
+    Retrieves and displays radar system information using the ITR3800 API.
+    """
+    try:
+        system_info = ITR3800_SystemInfo_t()
+        result = api.ITR3800_getSystemInfo(handle, ctypes.byref(system_info))
+        if result != 0:
+            print(f"Error: ITR3800_getSystemInfo failed with error code {result}")
+            return
+
+        print(f"Device:           ITR-{system_info.productcode}")
+        print(f"Serial Number:    {system_info.serialNumber}")
+        print(f"Software Version: {system_info.swVersionMajor}.{system_info.swVersionMinor:03d}")
+
+    except Exception as e:
+        print(f"An error occurred while retrieving system info: {e}")
 
 def get_gps_satellites_in_view(api, handle):
     """
     Retrieves and displays GPS satellites in view using the ITR3800 API.
-
-    :param api: The loaded radar API DLL.
-    :param handle: The initialized radar system handle.
     """
     try:
-        # Create an instance of the satellites structure
         satellites_info = ITR3800_GpsSatellitesInView_t()
-
-        # Call the ITR3800_getGpsSatellitesInView function
         result = api.ITR3800_getGpsSatellitesInView(handle, ctypes.byref(satellites_info))
-        if result != 0:  # Check for errors
+        if result != 0:
             print(f"Error: ITR3800_getGpsSatellitesInView failed with error code {result}")
             return
 
-        # Print the number of satellites
         print(f"Number of satellites in view: {satellites_info.count}")
-
-        # Print details of each satellite
         for i in range(satellites_info.count):
             satellite = satellites_info.satellites[i]
             print(f"Satellite {i + 1}:")
@@ -29,7 +38,6 @@ def get_gps_satellites_in_view(api, handle):
             print(f"  Signal Strength: {satellite.signalStrength:.2f} dB")
             print(f"  Elevation: {satellite.elevation:.2f}°")
             print(f"  Azimuth: {satellite.azimuth:.2f}°")
-            print()
 
     except Exception as e:
         print(f"An error occurred while retrieving GPS satellites: {e}")
