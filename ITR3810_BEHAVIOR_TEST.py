@@ -7,7 +7,7 @@ RADAR_PORT = 62150           # Replace with your radar's UDP port
 
 # Create a UDP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
+sock.connect((RADAR_IP, RADAR_PORT))
 # Request object list with all details enabled
 request = {
     "Command": "RequestObjectList",
@@ -21,14 +21,15 @@ try:
     print("Sending request to radar...")
     sock.sendto(json.dumps(request).encode(), (RADAR_IP, RADAR_PORT))
 
-    print("Listening for packets...")
+    
     
     with open("radar_response.json", "w") as f:
         # Start listening continuously
         while True:
             try:
                 # Receive a packet
-                data, _ = sock.recvfrom(4096)  # Adjust buffer size if needed
+                print("Listening for packets...")
+                data, _ = sock.recvfrom(1024)  # Adjust buffer size if needed
                 response = json.loads(data.decode())
                 
                 # Print the response
