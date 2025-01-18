@@ -1,6 +1,6 @@
 import ctypes
 from functions import get_system_info, get_gps_satellites_in_view
-from structures import ITR3800_GpsSatellitesInView_t
+from structures import ITR3800_GpsSatellitesInView_t, ITR3800_SystemInfo_t
 
 # Load the radar API DLL
 dll_path = "../Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll"  # Replace with the correct path
