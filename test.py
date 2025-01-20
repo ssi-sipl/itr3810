@@ -93,7 +93,7 @@ else:
 host_name = ctypes.create_string_buffer(256)
 length = ctypes.c_uint8(0)
 
-radar_api.ITR3800_getNetworkHostname.argtypes = [APIHandle_t, ctypes.POINTER(ctypes.c_ubyte)]
+radar_api.ITR3800_getNetworkHostname.argtypes = [APIHandle_t,ctypes.c_char_p ,ctypes.POINTER(ctypes.c_ubyte)]
 radar_api.ITR3800_getNetworkHostname.restype = ITR3800_Result_t
 
 result = radar_api.ITR3800_getNetworkHostname(handle, host_name, ctypes.byref(length))
