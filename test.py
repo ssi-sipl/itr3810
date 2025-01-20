@@ -122,7 +122,7 @@ class ITR3800_TrackedObject_t(ctypes.Structure):
         ("f32_length_m", ctypes.c_float),
         ("f32_width_m", ctypes.c_float),
     ]
-    _pack_ = 4
+    _pack_ = 1
 
 
 
@@ -167,16 +167,14 @@ class ITR3800_ObjectList_t(ctypes.Structure):
         ("reserved2", ctypes.c_float),
         ("reserved3", ctypes.c_float),
     ]
+    _pack_=1
 
 
 
 object_list = ITR3800_ObjectList_t()
  # Create a new object list structure
 # Set the argument and return types for the function
-class SimpleStruct(ctypes.Structure):
-    _fields_ = [("field1", ctypes.c_uint32), ("field2", ctypes.c_uint16)]
 
-simple_obj = SimpleStruct()
 
 radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
 radar_api.ITR3800_getObjectList.restype = ITR3800_Result_t
@@ -187,7 +185,7 @@ print(f"Object list before calling: {object_list}")
 
 try:
 
-    result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(simple_obj))
+    result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
     print("Newwwwwwwww10")
     print("Object List: ", result)
         
