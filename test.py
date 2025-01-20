@@ -84,7 +84,7 @@ print("Description Result: ", result)
 
 if result == 0:
     print(f"Description Length: {description.descriptionLength}")
-    print(f"Description: {description.description}")
+    print(f"Description: {description.description.hex()}")
 else:
     print(f"Error occurred: {result}")
 
