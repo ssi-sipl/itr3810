@@ -93,12 +93,13 @@ else:
 host_name = ctypes.create_string_buffer(256)
 length = ctypes.c_uint8(0)
 
-radar_api.ITR3800_getNetworkHostname.argtypes = [APIHandle_t, ctypes.POINTER(ctypes.c_uint8)]
+radar_api.ITR3800_getNetworkHostname.argtypes = [APIHandle_t, ctypes.POINTER(ctypes.c_ubyte)]
 radar_api.ITR3800_getNetworkHostname.restype = ITR3800_Result_t
 
 result = radar_api.ITR3800_getNetworkHostname(handle, host_name, ctypes.byref(length))
 
 if result == 0:  # Assuming 0 means success
+    print(f"Hostname Length: {length.value}")
     print(f"Radar Hostname: {host_name.value.decode('utf-8')}")
 else:
     print(f"Error retrieving network hostname: {result}")
