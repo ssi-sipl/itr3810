@@ -67,6 +67,27 @@ else:
 
 #-----------------------------------------------------------------------------
 
+class ITR3800_Description_t(ctypes.Structure):
+    _fields_ = [("description", ctypes.c_char * 256),  # Assuming 256 as max length for description
+                ("descriptionLength", ctypes.c_uint8)]  # uint8_t is an unsigned 8-bit integer
+
+
+radar_api.ITR3800_getDescription.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_Description_t)]
+radar_api.ITR3800_getDescription.restype = ITR3800_Result_t
+
+description = ITR3800_Description_t()
+
+result = radar_api.ITR3800_getDescription(APIHandle_t,ctypes.byref(description))
+print("Description Result: ", result)
+
+if result == 0:
+    print(f"Description: {description.description.decode('utf-8')}")
+    print(f"Description Length: {description.descriptionLength}")
+else:
+    print(f"Error occurred: {result}")
+
+#-----------------------------------------------------------------------------
+
 
 
 radar_api.ITR3800_exitSystem.argtypes = [APIHandle_t]
@@ -80,4 +101,5 @@ else:
     print(f"Failed to exit radar system: Error code {result}")
 
 #-----------------------------------------------------------------------------
+
 
