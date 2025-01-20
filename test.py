@@ -123,6 +123,7 @@ class ITR3800_TrackedObject_t(ctypes.Structure):
         ("f32_length_m", ctypes.c_float),
         ("f32_width_m", ctypes.c_float),
     ]
+    _pack_ = 1
 
 print("Newwwwwwwww3")
 
@@ -175,7 +176,8 @@ class ITR3800_ObjectList_t(ctypes.Structure):
 print("Newwwwwwwww7")
 
 
-object_list = ITR3800_ObjectList_t()  # Create a new object list structure
+object_list = ITR3800_ObjectList_t()
+ # Create a new object list structure
 # Set the argument and return types for the function
 
 print("Newwwwwwwww8")
@@ -185,9 +187,12 @@ print("Newwwwwwwww8")
 radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
 radar_api.ITR3800_getObjectList.restype = ctypes.c_int
 
+
 print("Newwwwwwwww9")
 
 print(f"Handle value before calling ITR3800_getObjectList: {handle.value}")
+print(f"Object list before calling: {object_list}")
+
 
 try:
 
