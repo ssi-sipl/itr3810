@@ -122,7 +122,7 @@ class ITR3800_TrackedObject_t(ctypes.Structure):
         ("f32_length_m", ctypes.c_float),
         ("f32_width_m", ctypes.c_float),
     ]
-    _pack_ = 1
+    _pack_ = 4
 
 
 
