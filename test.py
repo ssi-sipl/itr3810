@@ -184,7 +184,7 @@ print("Newwwwwwwww8")
 
 
 
-radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
+radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(object_list)]
 radar_api.ITR3800_getObjectList.restype = ctypes.c_int
 
 
