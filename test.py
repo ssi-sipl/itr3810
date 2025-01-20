@@ -175,7 +175,7 @@ class ITR3800_ObjectList_t(ctypes.Structure):
         ("timestamp_ms", ctypes.c_uint32),
         ("frameID", ctypes.c_uint16),
         ("nrOfTracks", ctypes.c_uint16),
-        ("trackedObjects", ITR3800_TrackedObject_t * 256),  # Assuming max 50 tracked objects
+         ("trackedObjects", ctypes.ARRAY(ITR3800_TrackedObject_t, 256)),  # Assuming max 50 tracked objects
         ("eventMessages", ITR3800_EventMessageList_t),
         ("reserved0", ctypes.c_float),
         ("reserved1", ctypes.c_float),
