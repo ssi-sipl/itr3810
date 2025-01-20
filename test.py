@@ -97,6 +97,9 @@ class ITR3800_TrackClass_u(ctypes.Union):
         ("dummy", ctypes.c_uint32)
     ]
 
+print("Newwwwwwwww2")
+
+
 class ITR3800_TrackedObject_t(ctypes.Structure):
     _fields_ = [
         ("ui32_objectID", ctypes.c_uint32),
@@ -121,11 +124,17 @@ class ITR3800_TrackedObject_t(ctypes.Structure):
         ("f32_width_m", ctypes.c_float),
     ]
 
+print("Newwwwwwwww3")
+
+
 class ITR3800_EventMessage_t(ctypes.Structure):
     _fields_ = [
         ("c_eventMessage", ctypes.c_char * 256),  # Assuming max length
         ("ui8_eventMessageLength", ctypes.c_uint8)
     ]
+
+print("Newwwwwwwww4")
+
 
 class ITR3800_EventMessageList_t(ctypes.Structure):
     _fields_ = [
@@ -133,11 +142,17 @@ class ITR3800_EventMessageList_t(ctypes.Structure):
         ("nrOfMessages", ctypes.c_uint8)
     ]
 
+print("Newwwwwwwww5")
+
+
 class ITR3800_ObjectListError_u(ctypes.Union):
     _fields_ = [
         ("ITR3800_ObjectListError", ctypes.c_uint32),
         ("dummy", ctypes.c_uint32)
     ]
+
+print("Newwwwwwwww6")
+
 
 class ITR3800_ObjectList_t(ctypes.Structure):
     _fields_ = [
@@ -157,12 +172,22 @@ class ITR3800_ObjectList_t(ctypes.Structure):
         ("reserved3", ctypes.c_float),
     ]
 
+print("Newwwwwwwww7")
+
+
 object_list = ITR3800_ObjectList_t()  # Create a new object list structure
 # Set the argument and return types for the function
+
+print("Newwwwwwwww8")
+
 radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
 radar_api.ITR3800_getObjectList.restype = ctypes.c_int
 
+print("Newwwwwwwww9")
+
+
 result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
+print("Newwwwwwwww10")
 print("Object List: ", result)
     
     # Check the result code
