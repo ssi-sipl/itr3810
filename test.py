@@ -23,11 +23,11 @@ radar_api.ITR3800_initSystem.restype = ITR3800_Result_t
 
 result = radar_api.ITR3800_initSystem(ctypes.byref(handle), 192, 168, 31, 200)
 print("Init Result: ", result)
-print(handle.value)
 if result != 0:
     raise RuntimeError(f"Failed to initialize radar API: Error code {result}")
     exit()
 print("Radar system initialized successfully.")
+print(handle.value)
 
 #-----------------------------------------------------------------------------
 
@@ -71,7 +71,7 @@ else:
 
 class ITR3800_Description_t(ctypes.Structure):
     _fields_ = [("description", ctypes.c_char * 256),  # Assuming 256 as max length for description
-                ("descriptionLength", ctypes.c_uint8)]  # uint8_t is an unsigned 8-bit integer
+                ("descriptionLength", ctypes.c_int8)]  # uint8_t is an unsigned 8-bit integer
 
 
 radar_api.ITR3800_getDescription.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_Description_t)]
