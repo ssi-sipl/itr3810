@@ -189,25 +189,28 @@ print("Newwwwwwwww9")
 
 print(f"Handle value before calling ITR3800_getObjectList: {handle.value}")
 
+try:
 
-result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
-print("Newwwwwwwww10")
-print("Object List: ", result)
-    
-    # Check the result code
-if result != 0:  # Assuming 0 means success
-    print(f"Error: Unable to get object list, error code: {result}")
-else:
-    # Check the number of tracked objects
-    if object_list.nrOfTracks > 0:
-        print(f"Number of objects: {object_list.nrOfTracks}")
-        # Process the object list (example of accessing tracked objects)
-        for obj in object_list.trackedObjects[:object_list.nrOfTracks]:  # Slice based on actual number of objects
-            print(f"Object ID: {obj.ui32_objectID}")
-            print(f"Position: ({obj.f32_positionX_m}, {obj.f32_positionY_m})")
-            print(f"Velocity: ({obj.f32_velocityX_mps}, {obj.f32_velocityY_mps})")
+    result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
+    print("Newwwwwwwww10")
+    print("Object List: ", result)
+        
+        # Check the result code
+    if result != 0:  # Assuming 0 means success
+        print(f"Error: Unable to get object list, error code: {result}")
     else:
-        print("No objects in the list.")
+        # Check the number of tracked objects
+        if object_list.nrOfTracks > 0:
+            print(f"Number of objects: {object_list.nrOfTracks}")
+            # Process the object list (example of accessing tracked objects)
+            for obj in object_list.trackedObjects[:object_list.nrOfTracks]:  # Slice based on actual number of objects
+                print(f"Object ID: {obj.ui32_objectID}")
+                print(f"Position: ({obj.f32_positionX_m}, {obj.f32_positionY_m})")
+                print(f"Velocity: ({obj.f32_velocityX_mps}, {obj.f32_velocityY_mps})")
+        else:
+            print("No objects in the list.")
+except Exception as e:
+    print(e)
 
 #-----------------------------------------------------------------------------
 
