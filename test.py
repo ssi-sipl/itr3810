@@ -55,7 +55,7 @@ else:
 
 version = ctypes.c_float
 
-radar_api.ITR3800_getApiVersion.argtypes = [ctypes.pointer(version)]
+radar_api.ITR3800_getApiVersion.argtypes = [version]
 radar_api.ITR3800_getApiVersion.restypes = ctypes.c_int
 
 result = radar_api.ITR3800_getApiVersion(ctypes.byref(version))
