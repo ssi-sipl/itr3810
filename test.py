@@ -180,10 +180,14 @@ object_list = ITR3800_ObjectList_t()  # Create a new object list structure
 
 print("Newwwwwwwww8")
 
+
+
 radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
 radar_api.ITR3800_getObjectList.restype = ctypes.c_int
 
 print("Newwwwwwwww9")
+
+print(f"Handle value before calling ITR3800_getObjectList: {handle.value}")
 
 
 result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
