@@ -156,12 +156,13 @@ class ITR3800_ObjectList_t(ctypes.Structure):
         ("reserved3", ctypes.c_float),
     ]
 
+object_list = ITR3800_ObjectList_t()  # Create a new object list structure
 # Set the argument and return types for the function
 radar_api.ITR3800_getObjectList.argtypes = [ctypes.c_void_p, ctypes.POINTER(ITR3800_ObjectList_t)]
 radar_api.ITR3800_getObjectList.restype = ctypes.c_int
 
-object_list = ITR3800_ObjectList_t()  # Create a new object list structure
 result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
+print("Object List: ", result)
     
     # Check the result code
 if result != 0:  # Assuming 0 means success
