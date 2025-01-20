@@ -23,8 +23,10 @@ radar_api.ITR3800_initSystem.restype = ITR3800_Result_t
 
 result = radar_api.ITR3800_initSystem(ctypes.byref(handle), 192, 168, 31, 200)
 print("Init Result: ", result)
+print(handle.value)
 if result != 0:
     raise RuntimeError(f"Failed to initialize radar API: Error code {result}")
+    exit()
 print("Radar system initialized successfully.")
 
 #-----------------------------------------------------------------------------
