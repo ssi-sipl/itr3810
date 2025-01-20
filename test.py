@@ -89,6 +89,7 @@ else:
     print(f"Error occurred: {result}")
 
 #-----------------------------------------------------------------------------
+print("Newwwwwwwww")
 
 class ITR3800_TrackClass_u(ctypes.Union):
     _fields_ = [
