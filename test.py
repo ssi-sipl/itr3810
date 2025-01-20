@@ -158,7 +158,7 @@ class ITR3800_ObjectList_t(ctypes.Structure):
 
 object_list = ITR3800_ObjectList_t()  # Create a new object list structure
 # Set the argument and return types for the function
-radar_api.ITR3800_getObjectList.argtypes = [ctypes.c_void_p, ctypes.POINTER(ITR3800_ObjectList_t)]
+radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
 radar_api.ITR3800_getObjectList.restype = ctypes.c_int
 
 result = radar_api.ITR3800_getObjectList(handle, ctypes.byref(object_list))
@@ -167,16 +167,17 @@ print("Object List: ", result)
     # Check the result code
 if result != 0:  # Assuming 0 means success
     print(f"Error: Unable to get object list, error code: {result}")
-    
-if object_list:
-    print("Object list successfully retrieved!")
-    # Process the object list (example of accessing tracked objects)
-    for obj in object_list.trackedObjects:
+else:
+    # Check the number of tracked objects
+    if object_list.nrOfTracks > 0:
+        print(f"Number of objects: {object_list.nrOfTracks}")
+        # Process the object list (example of accessing tracked objects)
+        for obj in object_list.trackedObjects[:object_list.nrOfTracks]:  # Slice based on actual number of objects
             print(f"Object ID: {obj.ui32_objectID}")
             print(f"Position: ({obj.f32_positionX_m}, {obj.f32_positionY_m})")
             print(f"Velocity: ({obj.f32_velocityX_mps}, {obj.f32_velocityY_mps})")
-else:
-    print("Failed to retrieve object list.")
+    else:
+        print("No objects in the list.")
 
 #-----------------------------------------------------------------------------
 
