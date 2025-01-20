@@ -89,7 +89,7 @@ else:
     print(f"Error occurred: {result}")
 
 #-----------------------------------------------------------------------------
-print("Newwwwwwwww")
+
 
 class ITR3800_TrackClass_u(ctypes.Union):
     _fields_ = [
@@ -97,7 +97,6 @@ class ITR3800_TrackClass_u(ctypes.Union):
         ("dummy", ctypes.c_uint32)
     ]
 
-print("Newwwwwwwww2")
 
 
 class ITR3800_TrackedObject_t(ctypes.Structure):
@@ -125,7 +124,6 @@ class ITR3800_TrackedObject_t(ctypes.Structure):
     ]
     _pack_ = 1
 
-print("Newwwwwwwww3")
 
 
 class ITR3800_EventMessage_t(ctypes.Structure):
@@ -134,7 +132,6 @@ class ITR3800_EventMessage_t(ctypes.Structure):
         ("ui8_eventMessageLength", ctypes.c_uint8)
     ]
 
-print("Newwwwwwwww4")
 
 
 class ITR3800_EventMessageList_t(ctypes.Structure):
@@ -143,7 +140,6 @@ class ITR3800_EventMessageList_t(ctypes.Structure):
         ("nrOfMessages", ctypes.c_uint8)
     ]
 
-print("Newwwwwwwww5")
 
 
 class ITR3800_ObjectListError_u(ctypes.Union):
@@ -152,7 +148,6 @@ class ITR3800_ObjectListError_u(ctypes.Union):
         ("dummy", ctypes.c_uint32)
     ]
 
-print("Newwwwwwwww6")
 
 
 class ITR3800_ObjectList_t(ctypes.Structure):
@@ -173,22 +168,14 @@ class ITR3800_ObjectList_t(ctypes.Structure):
         ("reserved3", ctypes.c_float),
     ]
 
-print("Newwwwwwwww7")
 
 
 object_list = ITR3800_ObjectList_t()
  # Create a new object list structure
 # Set the argument and return types for the function
 
-print("Newwwwwwwww8")
-
-
-
 radar_api.ITR3800_getObjectList.argtypes = [APIHandle_t, ctypes.POINTER(ITR3800_ObjectList_t)]
-radar_api.ITR3800_getObjectList.restype = ctypes.c_int
-
-
-print("Newwwwwwwww9")
+radar_api.ITR3800_getObjectList.restype = ITR3800_Result_t
 
 print(f"Handle value before calling ITR3800_getObjectList: {handle.value}")
 print(f"Object list before calling: {object_list}")
@@ -205,6 +192,7 @@ try:
         print(f"Error: Unable to get object list, error code: {result}")
     else:
         # Check the number of tracked objects
+        print(object_list)
         if object_list.nrOfTracks > 0:
             print(f"Number of objects: {object_list.nrOfTracks}")
             # Process the object list (example of accessing tracked objects)
