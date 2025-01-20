@@ -84,7 +84,7 @@ print("Description Result: ", result)
 
 if result == 0:
     print(f"Description Length: {description.descriptionLength}")
-    print(f"Description: {description.description.decode('utf-8', 'ignore')}")
+    print(f"Description: {description.description}")
 else:
     print(f"Error occurred: {result}")
 
