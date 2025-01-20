@@ -148,6 +148,61 @@ else:
 #         ("dummy", ctypes.c_uint32)
 #     ]
 
+# Define ITR3800_ObjectListError_u
+class ITR3800_ObjectListError_u(ctypes.Union):
+    _fields_ = [
+        ("ITR3800_ObjectListError", ctypes.c_uint32),
+        ("dummy", ctypes.c_uint32)
+    ]
+
+# Define ITR3800_TrackClass_u
+class ITR3800_TrackClass_u(ctypes.Union):
+    _fields_ = [
+        ("ITR3800_TrackClass", ctypes.c_uint32),
+        ("dummy", ctypes.c_uint32)
+    ]
+
+# Define ITR3800_TrackedObject_t
+class ITR3800_TrackedObject_t(ctypes.Structure):
+    _fields_ = [
+        ("ui32_objectID", ctypes.c_uint32),
+        ("ui16_ageCount", ctypes.c_uint16),
+        ("ui16_predictionCount", ctypes.c_uint16),
+        ("ui16_staticCount", ctypes.c_uint16),
+        ("f32_trackQuality", ctypes.c_float),
+        ("classID", ITR3800_TrackClass_u),
+        ("si16_motion_eventZoneIndex", ctypes.c_int16),
+        ("si16_presence_eventZoneIndex", ctypes.c_int16),
+        ("si16_loop_eventZoneIndex", ctypes.c_int16),
+        ("f32_positionX_m", ctypes.c_float),
+        ("f32_positionY_m", ctypes.c_float),
+        ("f32_velocityX_mps", ctypes.c_float),
+        ("f32_velocityY_mps", ctypes.c_float),
+        ("f32_velocityInDir_mps", ctypes.c_float),
+        ("f32_directionX", ctypes.c_float),
+        ("f32_directionY", ctypes.c_float),
+        ("f32_distanceToFront_m", ctypes.c_float),
+        ("f32_distanceToBack_m", ctypes.c_float),
+        ("f32_length_m", ctypes.c_float),
+        ("f32_width_m", ctypes.c_float),
+    ]
+
+# Define ITR3800_EventMessage_t
+class ITR3800_EventMessage_t(ctypes.Structure):
+    _fields_ = [
+        ("c_eventMessage", ctypes.c_char * 256),  # Assuming max length
+        ("ui8_eventMessageLength", ctypes.c_uint8)
+    ]
+
+# Define ITR3800_EventMessageList_t
+class ITR3800_EventMessageList_t(ctypes.Structure):
+    _fields_ = [
+        ("eventMessages", ITR3800_EventMessage_t * 10),  # Assuming max 10 messages
+        ("nrOfMessages", ctypes.c_uint8)
+    ]
+
+
+
 
 
 class ITR3800_ObjectList_t(ctypes.Structure):
