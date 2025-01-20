@@ -77,7 +77,7 @@ radar_api.ITR3800_getDescription.restype = ITR3800_Result_t
 
 description = ITR3800_Description_t()
 
-result = radar_api.ITR3800_getDescription(APIHandle_t(),ctypes.byref(description))
+result = radar_api.ITR3800_getDescription(APIHandle_t,ctypes.byref(description))
 print("Description Result: ", result)
 
 if result == 0:
