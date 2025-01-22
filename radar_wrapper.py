@@ -212,7 +212,7 @@ def example_usage():
         print(f"Radar API Version: {version}")
         
         # Initialize the system
-        radar.init_system("192.168.1.100")  # Replace with actual radar IP
+        radar.init_system("192.168.31.200")  # Replace with actual radar IP
         
         # Get and print object data
         data = radar.get_object_list()
