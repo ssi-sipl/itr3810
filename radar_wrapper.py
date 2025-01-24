@@ -1,10 +1,10 @@
 from ctypes import *
 import ctypes.util
 import sys
+import time
 
 # Basic type definitions matching ITR3800_radarAPI_basicTypes.h
 class BasicTypes:
-    # Map the radar's types to ctypes types
     bool_t = c_ushort
     float32_t = c_float
     sint8_t = c_byte
@@ -14,14 +14,24 @@ class BasicTypes:
     sint32_t = c_int
     uint32_t = c_uint
 
-# Constants from the header files
+# Constants
 MAX_TRACKS = 0x3C
 ITR3800_MAX_NR_OF_TRACKS = 256
 ITR3800_MAX_NR_OF_DETECTIONS = 512
 ITR3800_MAX_EVENT_MESSAGE_LENGTH = 128
 ITR3800_MAX_NR_OF_EVENT_MESSAGES = 256
 
-# Structure definitions using proper basic types
+# Error descriptions
+ITR3800_ERRORS = {
+    0x200: "No connection available.",
+    0x201: "No valid socket.",
+    0x202: "iSYS software version not supported.",
+    0x203: "Raw data: No first valid frame.",
+    0x204: "Object list size: Metric and imperial mismatch.",
+    0x205: "Firmware version incompatible."
+}
+
+# Structure definitions
 class ITR3800_EventMessage(Structure):
     _fields_ = [
         ("c_eventMessage", BasicTypes.uint8_t * ITR3800_MAX_EVENT_MESSAGE_LENGTH),
@@ -94,49 +104,33 @@ class RadarAPI:
         except OSError as e:
             raise Exception(f"Failed to load radar DLL: {e}")
 
-        # Set up function signatures
         self._setup_function_signatures()
 
     def _setup_function_signatures(self):
-        """Set up the function signatures for the DLL functions."""
-        # API Version
         self.radar_dll.ITR3800_getApiVersion.argtypes = [POINTER(BasicTypes.float32_t)]
         self.radar_dll.ITR3800_getApiVersion.restype = BasicTypes.uint32_t
-
-        # System initialization
         self.radar_dll.ITR3800_initSystem.argtypes = [
             POINTER(c_void_p),
-            BasicTypes.uint8_t, BasicTypes.uint8_t, 
-            BasicTypes.uint8_t, BasicTypes.uint8_t
+            BasicTypes.uint8_t, BasicTypes.uint8_t, BasicTypes.uint8_t, BasicTypes.uint8_t
         ]
         self.radar_dll.ITR3800_initSystem.restype = BasicTypes.uint32_t
-
-        # Object list retrieval
-        self.radar_dll.ITR3800_getObjectList.argtypes = [
-            c_void_p,
-            POINTER(ITR3800_ObjectList)
-        ]
+        self.radar_dll.ITR3800_getObjectList.argtypes = [c_void_p, POINTER(ITR3800_ObjectList)]
         self.radar_dll.ITR3800_getObjectList.restype = BasicTypes.uint32_t
-
-        # System exit
         self.radar_dll.ITR3800_exitSystem.argtypes = [c_void_p]
         self.radar_dll.ITR3800_exitSystem.restype = BasicTypes.uint32_t
 
+    def handle_error(self, error_code):
+        """Translate error code into a human-readable message."""
+        return ITR3800_ERRORS.get(error_code, f"Unknown error code: {error_code}")
+
     def get_api_version(self):
-        """Get the API version of the radar system."""
         version = BasicTypes.float32_t()
         result = self.radar_dll.ITR3800_getApiVersion(byref(version))
-        if result == 0:  # Assuming 0 is SUCCESS
-            return version.value
-        raise Exception(f"Failed to get API version. Error code: {result}")
+        if result != 0:
+            raise Exception(self.handle_error(result))
+        return version.value
 
     def init_system(self, ip_address):
-        """
-        Initialize the radar system.
-        
-        Args:
-            ip_address (str): IP address of the radar system (e.g., "192.168.1.100")
-        """
         ip_parts = [int(x) for x in ip_address.split('.')]
         handle = c_void_p()
         result = self.radar_dll.ITR3800_initSystem(
@@ -146,85 +140,43 @@ class RadarAPI:
             BasicTypes.uint8_t(ip_parts[2]),
             BasicTypes.uint8_t(ip_parts[3])
         )
-        
-        if result == 0:
-            self.handle = handle
-            return True
-        raise Exception(f"Failed to initialize radar system. Error code: {result}")
+        if result != 0:
+            raise Exception(self.handle_error(result))
+        self.handle = handle
 
     def get_object_list(self):
-        """Get the current list of tracked objects."""
         if not hasattr(self, 'handle'):
             raise Exception("Radar system not initialized")
-
         object_list = ITR3800_ObjectList()
         result = self.radar_dll.ITR3800_getObjectList(self.handle, byref(object_list))
+        if result != 0:
+            raise Exception(self.handle_error(result))
         
-        if result == 0:
-            return {
-                'timestamp_ms': object_list.timestamp_ms,
-                'frame_id': object_list.frameID,
-                'num_tracks': object_list.nrOfTracks,
-                'objects': [{
-                    'id': obj.ui32_objectID,
-                    'position': {
-                        'x': obj.f32_positionX_m,
-                        'y': obj.f32_positionY_m
-                    },
-                    'velocity': {
-                        'x': obj.f32_velocityX_mps,
-                        'y': obj.f32_velocityY_mps,
-                        'direction': obj.f32_velocityInDir_mps
-                    },
-                    'dimensions': {
-                        'length': obj.f32_length_m,
-                        'width': obj.f32_width_m
-                    },
-                    'quality': obj.f32_trackQuality,
-                    'class_id': obj.classID.classID,
-                    'age_count': obj.ui16_ageCount,
-                    'static_count': obj.ui16_staticCount,
-                    'event_zones': {
-                        'motion': obj.si16_motion_eventZoneIndex,
-                        'presence': obj.si16_presence_eventZoneIndex,
-                        'loop': obj.si16_loop_eventZoneIndex
-                    }
-                } for obj in object_list.trackedObjects[:object_list.nrOfTracks]]
-            }
-        
-        raise Exception(f"Failed to get object list. Error code: {result}")
+        return object_list
 
     def exit_system(self):
-        """Safely shut down the radar system."""
         if hasattr(self, 'handle'):
             result = self.radar_dll.ITR3800_exitSystem(self.handle)
-            if result == 0:
-                del self.handle
-                return True
-            raise Exception(f"Failed to exit system. Error code: {result}")
-        return False
+            if result != 0:
+                raise Exception(self.handle_error(result))
+            del self.handle
 
 def example_usage():
     radar = RadarAPI("./Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll")
     try:
-        # Get API version
-        version = radar.get_api_version()
-        print(f"Radar API Version: {version}")
-        
-        # Initialize the system
-        radar.init_system("192.168.31.200")  # Replace with actual radar IP
-        
-        # Get and print object data
-        data = radar.get_object_list()
-        print(f"\nFrame {data['frame_id']} at {data['timestamp_ms']}ms")
-        print(f"Detected {data['num_tracks']} objects:")
-        
-        for obj in data['objects']:
-            print(f"\nObject ID: {obj['id']}")
-            print(f"Position: ({obj['position']['x']:.2f}m, {obj['position']['y']:.2f}m)")
-            print(f"Velocity: {obj['velocity']['direction']:.2f} m/s")
-            print(f"Quality: {obj['quality']:.2f}")
-            
+        print(f"Radar API Version: {radar.get_api_version()}")
+        radar.init_system("192.168.31.200")
+        time.sleep(1)      
+        objects = radar.get_object_list()
+        if objects.nrOfTracks > 0:
+            print(f"Number of objects: {objects.nrOfTracks}")
+            # Process the object list (example of accessing tracked objects)
+            for obj in objects.trackedObjects[:objects.nrOfTracks]:  # Slice based on actual number of objects
+                print(f"Object ID: {obj.ui32_objectID}")
+                print(f"Position: ({obj.f32_positionX_m}, {obj.f32_positionY_m})")
+                print(f"Velocity: ({obj.f32_velocityX_mps}, {obj.f32_velocityY_mps})")
+        else:
+            print("No objects in the list.")
     finally:
         radar.exit_system()
 
