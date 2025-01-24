@@ -252,6 +252,15 @@ class RadarAPI:
 def get_class(class_id):
     return ITR3800_TrackClass.get(class_id, "UNKNOWN")
 
+def calculate_azimuth(x, y):
+    angle_radians = math.atan2(y, x)
+    angle_degrees = math.degrees(angle_radians)
+    # Ensure the angle is in the range [0, 360)
+    if angle_degrees < 0:
+        angle_degrees += 360
+    
+    return angle_degrees
+
 def parse_object_list(object_list):
     if object_list.nrOfTracks > 0:
         print("-"*40)
@@ -286,6 +295,8 @@ def parse_object_list(object_list):
             object_lat = RADAR_LAT + delta_lat_deg
             object_lon = RADAR_LONG + delta_lon_deg
 
+            azimuth = calculate_azimuth(x, y)
+
             target_info = {
             'radar_id': RADAR_ID,
             'area_id': AREA_ID,
@@ -294,7 +305,7 @@ def parse_object_list(object_list):
             'signal_strength': round(signal_strength, 2),
             'range': round(range, 2),
             'speed': round(velocity, 2),
-            'aizmuth_angle': round(0, 2),
+            'aizmuth_angle': round(azimuth, 2),
             'distance': round(distance, 2),
             'direction': "Static" if velocity == 0 else "Incoming" if velocity > 0 else "Outgoing",
             'classification': classification, # ['vehicle', 'person', 'bicycle', 'others']
