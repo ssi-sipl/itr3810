@@ -2,6 +2,59 @@ from ctypes import *
 import ctypes.util
 import sys
 import time
+import math
+import json
+import signal
+import paho.mqtt.client as mqtt
+
+SEND_MQTT = False
+
+RADAR_ID = "radar-itr3810"
+AREA_ID = "area-2"
+RADAR_LAT = 34.011125  #  radar latitude
+RADAR_LONG = 74.01219  #  radar longitude
+
+targets_data = []  # List to store valid targets
+output_file = "detected_targets.json"
+
+MQTT_BROKER = "localhost"  # Change to your broker's IP address if needed
+MQTT_PORT = 1883
+MQTT_CHANNEL = "radar_surveillance"
+
+mqtt_client = mqtt.Client()
+
+if SEND_MQTT:
+    try:
+        mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+        mqtt_client.loop_start()
+        print("Channel: ", MQTT_CHANNEL)
+        print(f"Connected to MQTT broker at {MQTT_BROKER}:{MQTT_PORT}")
+    except Exception as e:
+        print(f"Failed to connect to MQTT broker: {e}")
+        sys.exit(1)
+
+def publish_target(target):
+    try:
+        mqtt_client.publish(MQTT_CHANNEL, json.dumps(target))
+        print(f"Published target: {target}")
+    except Exception as e:
+        print(f"Failed to publish target: {e}")
+
+def save_to_json():
+    with open(output_file, "w") as file:
+        json.dump(targets_data, file, indent=4)
+    print(f"Data saved to {output_file}")
+
+def signal_handler(sig, frame):
+    print("\nCtrl+C detected! Saving data and exiting...")
+    save_to_json()
+    # print("Disconnecting from MQTT broker...")
+    # mqtt_client.loop_stop()
+    # mqtt_client.disconnect()
+    sys.exit(0)
+
+# Register the signal handler for graceful shutdown
+signal.signal(signal.SIGINT, signal_handler)
 
 # Basic type definitions matching ITR3800_radarAPI_basicTypes.h
 class BasicTypes:
@@ -29,6 +82,15 @@ ITR3800_ERRORS = {
     0x203: "Raw data: No first valid frame.",
     0x204: "Object list size: Metric and imperial mismatch.",
     0x205: "Firmware version incompatible."
+}
+
+ITR3800_TrackClass = {
+    2: "OTHERS",
+    10: "PEDESTRIAN",
+    12: "BICYCLE",
+    30: "CAR",
+    60: "SMALL_TRUCK",
+    70: "BIG_TRUCK"
 }
 
 # Structure definitions
@@ -122,6 +184,8 @@ class RadarAPI:
     def handle_error(self, error_code):
         """Translate error code into a human-readable message."""
         return ITR3800_ERRORS.get(error_code, f"Unknown error code: {error_code}")
+    
+   
 
     def get_api_version(self):
         version = BasicTypes.float32_t()
@@ -161,24 +225,84 @@ class RadarAPI:
                 raise Exception(self.handle_error(result))
             del self.handle
 
-def example_usage():
+def get_class(class_id):
+    return ITR3800_TrackClass.get(class_id, "UNKNOWN")
+
+def parse_object_list(object_list):
+    if object_list.nrOfTracks > 0:
+        print("-"*40)
+        frame_id = object_list.frameID
+        timestamp = object_list.timestamp_ms
+
+        print(f"Frame ID: {object_list.frameID}")
+        print(f"Timestamp: {object_list.timestamp_ms}")
+        print(f"Number of objects: {object_list.nrOfTracks}")
+        print(f"Frame ID: {frame_id}")
+        print("Detected Targets:")
+        print(f"{'Serial':<8} {'Signal Strength (%)':<25} {'Range (m)':<15} {'Velocity (m/s)':<25} {'Direction':<15} {'Azimuth (Deg)':<25} {'x (m) y (m)':<25} {'Latitude':<25} {'Longitude':<25} {'Classification':<25}")
+
+        
+        for obj in object_list.trackedObjects[:object_list.nrOfTracks]:  # Slice based on actual number of objects
+            velocity = obj.f32_velocityInDir_mps
+            signal_strength = obj.f32_trackQuality
+            range = obj.f32_distanceToFront_m
+            distance = obj.f32_distanceToFront_m
+            classification = get_class(obj.classID.classID)
+            x = obj.f32_positionX_m
+            y = obj.f32_positionY_m
+            idx = obj.ui32_objectID
+
+            radar_lat_rad = math.radians(RADAR_LAT) # Convert radar latitude to radians
+        
+            # Calculate change in latitude and longitude in degrees
+            delta_lat_deg = y / 111139
+            delta_lon_deg = x / (111139 * math.cos(radar_lat_rad))
+            
+            # Final coordinates of the object
+            object_lat = RADAR_LAT + delta_lat_deg
+            object_lon = RADAR_LONG + delta_lon_deg
+
+            target_info = {
+            'radar_id': RADAR_ID,
+            'area_id': AREA_ID,
+            'frame_id': frame_id,
+            'timestamp': str(timestamp),
+            'signal_strength': round(signal_strength, 2),
+            'range': round(range, 2),
+            'speed': round(velocity, 2),
+            'aizmuth_angle': round(0, 2),
+            'distance': round(distance, 2),
+            'direction': "Static" if velocity == 0 else "Incoming" if velocity > 0 else "Outgoing",
+            'classification': classification, # ['vehicle', 'person', 'bicycle', 'others']
+            'zone': 0,
+            'x': round(x, 2),   
+            'y': round(y, 2),
+            'latitude': round(object_lat, 6),
+            'longitude': round(object_lon, 6),
+            }
+
+            targets_data.append(target_info)
+
+            if SEND_MQTT:
+                publish_target(target_info)
+
+            print(f"{idx:<8} {target_info['signal_strength']:<25} {target_info['range']:<15} {target_info['speed']:<25} {target_info['direction']:<15} {target_info['aizmuth_angle']:<25} {target_info['x']} {target_info['y']:<25} {target_info['latitude']:<25} {target_info['longitude']:<25} {target_info['classification']}")
+
+        print("-"*40)
+
+def main():
     radar = RadarAPI("./Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll")
     try:
         print(f"Radar API Version: {radar.get_api_version()}")
         radar.init_system("192.168.31.200")
-        time.sleep(1)      
-        objects = radar.get_object_list()
-        if objects.nrOfTracks > 0:
-            print(f"Number of objects: {objects.nrOfTracks}")
-            # Process the object list (example of accessing tracked objects)
-            for obj in objects.trackedObjects[:objects.nrOfTracks]:  # Slice based on actual number of objects
-                print(f"Object ID: {obj.ui32_objectID}")
-                print(f"Position: ({obj.f32_positionX_m}, {obj.f32_positionY_m})")
-                print(f"Velocity: ({obj.f32_velocityX_mps}, {obj.f32_velocityY_mps})")
-        else:
-            print("No objects in the list.")
+        time.sleep(1)
+        while True:      
+            objects = radar.get_object_list()
+            parse_object_list(objects)
+            time.sleep(0.1)
+        
     finally:
         radar.exit_system()
 
 if __name__ == "__main__":
-    example_usage()
+    main()
