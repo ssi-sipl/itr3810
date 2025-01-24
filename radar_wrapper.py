@@ -178,13 +178,19 @@ class RadarAPI:
         self.radar_dll.ITR3800_initSystem.restype = BasicTypes.uint32_t
         self.radar_dll.ITR3800_getObjectList.argtypes = [c_void_p, POINTER(ITR3800_ObjectList)]
         self.radar_dll.ITR3800_getObjectList.restype = BasicTypes.uint32_t
+
+        self.radar_dll.ITR3800_getSimulation.argtypes = [c_void_p, POINTER(BasicTypes.uint8_t)]
+        self.radar_dll.ITR3800_getSimulation.restype = BasicTypes.uint32_t
+
+        self.radar_dll.ITR3800_setSimulation.argtypes = [c_void_p, BasicTypes.uint8_t]
+        self.radar_dll.ITR3800_setSimulation.restype = BasicTypes.uint32_t
+
         self.radar_dll.ITR3800_exitSystem.argtypes = [c_void_p]
         self.radar_dll.ITR3800_exitSystem.restype = BasicTypes.uint32_t
 
     def handle_error(self, error_code):
         """Translate error code into a human-readable message."""
         return ITR3800_ERRORS.get(error_code, f"Unknown error code: {error_code}")
-    
    
 
     def get_api_version(self):
@@ -207,6 +213,24 @@ class RadarAPI:
         if result != 0:
             raise Exception(self.handle_error(result))
         self.handle = handle
+
+    def get_simulation(self):
+        if not hasattr(self, 'handle'):
+            raise Exception("Radar system not initialized")
+        simulation = BasicTypes.uint8_t()
+        result = self.radar_dll.ITR3800_getSimulation(self.handle, byref(simulation))
+        if result != 0:
+            raise Exception(self.handle_error(result))
+        return simulation.value
+    
+    def set_simulation(self, value):
+        if not hasattr(self, 'handle'):
+            raise Exception("Radar system not initialized")
+        result = self.radar_dll.ITR3800_setSimulation(self.handle, BasicTypes.uint8_t(value))
+        if result != 0:
+            raise Exception(self.handle_error(result))
+        
+        return self.handle_error(result)
 
     def get_object_list(self):
         if not hasattr(self, 'handle'):
