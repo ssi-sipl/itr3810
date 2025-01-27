@@ -329,7 +329,9 @@ def parse_object_list(object_list):
         print("-"*40)
 
 def main():
-    radar = RadarAPI("./Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll")
+    # radar = RadarAPI("./Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll")
+    
+    radar = RadarAPI("./Software/RadarAPI/library_v1.147/Linux_x64/libITR3800_radarAPI.so")
     try:
         print(f"Radar API Version: {radar.get_api_version()}")
         radar.init_system("192.168.31.200")
