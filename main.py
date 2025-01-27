@@ -6,7 +6,7 @@ import math
 import json
 import signal
 import paho.mqtt.client as mqtt
-from .config import *
+from config import *
 
 targets_data = []  # List to store valid targets
 
@@ -334,6 +334,9 @@ def main():
         print(f"Radar API Version: {radar.get_api_version()}")
         radar.init_system("192.168.31.200")
         time.sleep(1)
+
+        print("Simulation mode: ", "True" if radar.get_simulation() == 1 else "False")
+
         while True:      
             objects = radar.get_object_list()
             parse_object_list(objects)
