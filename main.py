@@ -330,13 +330,14 @@ def parse_object_list(object_list):
 
 def main():
     # radar = RadarAPI("./Software/RadarAPI/library_v1.147/Windows_msvc_2017_x64/ITR3800_radarAPI.dll")
-    
+
     radar = RadarAPI("./Software/RadarAPI/library_v1.147/Linux_x64/libITR3800_radarAPI.so")
     try:
         print(f"Radar API Version: {radar.get_api_version()}")
         radar.init_system("192.168.31.200")
         time.sleep(1)
 
+        # radar.set_simulation(0)
         print("Simulation mode: ", "True" if radar.get_simulation() == 1 else "False")
 
         while True:      
