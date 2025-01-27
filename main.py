@@ -334,7 +334,7 @@ def main():
     radar = RadarAPI("./Software/RadarAPI/library_v1.147/Linux_x64/libITR3800_radarAPI.so")
     try:
         print(f"Radar API Version: {radar.get_api_version()}")
-        radar.init_system("192.168.31.200")
+        radar.init_system(RADAR_IP)
         time.sleep(1)
 
         # radar.set_simulation(0)

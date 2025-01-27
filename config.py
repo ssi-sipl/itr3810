@@ -9,6 +9,7 @@ RADAR_ID = "radar-itr3810"
 AREA_ID = "area-2"
 RADAR_LAT = 34.011125  #  radar latitude
 RADAR_LONG = 74.01219  #  radar longitude
+RADAR_IP = "192.168.31.200"
 
 # Output Configuration
 OUTPUT_FILE = "detected_targets.json"
