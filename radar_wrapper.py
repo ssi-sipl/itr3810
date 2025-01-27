@@ -6,20 +6,9 @@ import math
 import json
 import signal
 import paho.mqtt.client as mqtt
-
-SEND_MQTT = False
-
-RADAR_ID = "radar-itr3810"
-AREA_ID = "area-2"
-RADAR_LAT = 34.011125  #  radar latitude
-RADAR_LONG = 74.01219  #  radar longitude
+from .config import *
 
 targets_data = []  # List to store valid targets
-output_file = "detected_targets.json"
-
-MQTT_BROKER = "localhost"  # Change to your broker's IP address if needed
-MQTT_PORT = 1883
-MQTT_CHANNEL = "radar_surveillance"
 
 mqtt_client = mqtt.Client()
 
@@ -41,9 +30,9 @@ def publish_target(target):
         print(f"Failed to publish target: {e}")
 
 def save_to_json():
-    with open(output_file, "w") as file:
+    with open(OUTPUT_FILE, "w") as file:
         json.dump(targets_data, file, indent=4)
-    print(f"Data saved to {output_file}")
+    print(f"Data saved to {OUTPUT_FILE}")
 
 def signal_handler(sig, frame):
     print("\nCtrl+C detected! Saving data and exiting...")
@@ -92,6 +81,20 @@ ITR3800_TrackClass = {
     60: "SMALL_TRUCK",
     70: "BIG_TRUCK"
 }
+
+# Combined classification mapping
+ITR3800_TrackClass_Mapped = {
+    "VEHICLE": [30, 60, 70],  # CAR, SMALL_TRUCK, BIG_TRUCK
+    "PERSON": [10, 12],       # PEDESTRIAN, BICYCLE
+    "OTHERS": [2]             # OTHERS
+}
+
+# Reverse the mapping for easy lookup
+classification_mapping = {}
+for category, keys in ITR3800_TrackClass_Mapped.items():
+    for key in keys:
+        classification_mapping[key] = category
+
 
 # Structure definitions
 class ITR3800_EventMessage(Structure):
@@ -250,7 +253,7 @@ class RadarAPI:
             del self.handle
 
 def get_class(class_id):
-    return ITR3800_TrackClass.get(class_id, "UNKNOWN")
+    return classification_mapping.get(class_id, "UNKNOWN")
 
 def calculate_azimuth(x, y):
     angle_radians = math.atan2(y, x)
