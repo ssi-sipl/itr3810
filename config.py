@@ -4,6 +4,8 @@ MQTT_BROKER = "localhost"  # Change to your broker's IP address if needed
 MQTT_PORT = 1883
 MQTT_CHANNEL = "radar_surveillance"
 MQTT_BROKER_SUBSCRIBER = "localhost" # Change to your broker's IP address
+MQTT_USERNAME = ""
+MQTT_PASSWORD = ""
 
 # Radar Configuration
 RADAR_IP = "192.168.31.200"

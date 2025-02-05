@@ -12,6 +12,8 @@ targets_data = []  # List to store valid targets
 
 mqtt_client = mqtt.Client()
 
+mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
+
 if SEND_MQTT:
     try:
         mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
