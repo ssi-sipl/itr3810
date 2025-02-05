@@ -22,7 +22,8 @@ This repository contains scripts to interface with the radar device, parse its d
 - **main.py**: The main script to run the radar interface.
 - **config.py**: Contains configuration variables for the radar.
 - **subscriber.py**: Subscribes to radar data and processes it.
-- **setup.sh**: Sets the Static IP
+- **setup.sh**: Sets the Static IP.
+- **update.sh**: Used for simplifying git pull on the RPI.
 
 ## Configuration
 
@@ -57,15 +58,15 @@ The `config.py` file contains variables that can be adjusted to configure the ra
    ./setup.sh
    ```
 
-1. **Run Main Script**: Execute `main.py` to start the radar interface.
+2. **Run Main Script**: Execute `main.py` to start the radar interface.
 
    ```sh
    python main.py
    ```
 
-1. **Configuration**: Adjust settings in `config.py` as needed.
+3. **Configuration**: Adjust settings in `config.py` as needed.
 
-1. **Subscriber**: Use `subscriber.py` to handle radar data subscriptions.
+4. **Subscriber**: Use `subscriber.py` to handle radar data subscriptions.
    ```sh
    python subscriber.py
    ```

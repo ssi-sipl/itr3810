@@ -40,8 +40,8 @@ set_static_ip() {
 
 # Main script
 echo "Select radar option:"
-echo "1. 150m"
-echo "2. 300m"
+echo "1. ISYS 5021 - 150m"
+echo "2. ITR 3810 - 300m"
 read -p "Enter your choice (1 or 2): " choice
 
 case "$choice" in
