@@ -1,8 +1,6 @@
 import paho.mqtt.client as mqtt
 from config import *
 
-
-
 def on_connect(client, userdata, flags, rc):
     print(f"Connected to broker with result code {rc}")
     client.subscribe(MQTT_CHANNEL)
@@ -12,6 +10,7 @@ def on_message(client, userdata, msg):
 
 def main():
     client = mqtt.Client()
+    client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
     client.on_connect = on_connect
     client.on_message = on_message
 
