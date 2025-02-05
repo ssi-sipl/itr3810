@@ -26,7 +26,7 @@ set_static_ip() {
 
     # Set the static IP address
     sudo ip addr flush dev "$interface"
-    sudo ip addr add "$ip_address" dev "$interface"
+    sudo ip addr add "$ip_address/24" dev "$interface"
     sudo ip route add default via "$gateway"
 
     # Check if the IP was set successfully
