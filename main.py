@@ -10,12 +10,28 @@ from config import *
 
 targets_data = []  # List to store valid targets
 
-mqtt_client = mqtt.Client()
-
-mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
-
 if SEND_MQTT:
+    mqtt_client = mqtt.Client()
+    mqtt_client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
+    is_connected_to_mqtt_flag = False
+    def on_connect(client, userdata, flags, rc):
+        global is_connected_to_mqtt_flag
+        if rc == 0:
+            print(f"✅ Connected to MQTT broker at {MQTT_BROKER}:{MQTT_PORT}")
+            client.subscribe(MQTT_CHANNEL)
+            is_connected_to_mqtt_flag = True
+        elif rc == 5:
+            print("❌ Connection refused: Not authorized. Check your username/password.")
+            client.loop_stop()  # Stop the MQTT loop
+            client.disconnect()  # Disconnect cleanly
+            raise SystemExit("Exiting due to authentication failure.")  # Stop script execution
+        else:
+            print(f"⚠️ Connection failed with result code {rc}")
+            client.loop_stop()
+            client.disconnect()
+            raise SystemExit("Exiting due to connection failure.")
     try:
+        mqtt_client.on_connect = on_connect
         mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
         mqtt_client.loop_start()
         print("Channel: ", MQTT_CHANNEL)
@@ -353,4 +369,9 @@ def main():
         radar.exit_system()
 
 if __name__ == "__main__":
-    main()
+    if SEND_MQTT:
+        if is_connected_to_mqtt_flag:
+            main()
+    else:
+        main()
+
